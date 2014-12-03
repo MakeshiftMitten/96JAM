@@ -152,7 +152,7 @@ function block(x, y, width, height, landingPad) {
 
 
 }
-playerList.push(new playerCharacter(2, gameHeight / 2));
+playerList.push(new playerCharacter(2, gameHeight -4));
 
 
 function drawGame() {
@@ -162,7 +162,8 @@ function drawGame() {
   drawWalls();
   drawBullets();
   drawTurrets();
-
+  tracer.log("Score: " + Math.floor(game.score));
+  tracer.log("Lives: " + playerList[0].lives);
   //Draw players
   for (var y = 0; y < playerList.length; y++) {
       var player = playerList[y];
@@ -298,8 +299,10 @@ function gameObject() {
   this.lost = false;
   this.won = false;
   this.level = 1;
+  this.score = 0;
 
-  this.playerOffset = 2;
+
+  this.playerOffset = 4;
 
   this.restore = function(){
     this.won = false;
@@ -422,7 +425,7 @@ function physics(d) {
   }
   for (var playerNum = 0; playerNum < playerList.length; playerNum++) {
       var player = playerList[playerNum];
-      player.velY -= 10*d;//  player.velA * d * .75;
+      player.velY -= 20*d;//  player.velA * d * .75;
       player.suicideCooldown -= d;
       var dAngle = 0;
       var dPower = 0;
@@ -441,15 +444,15 @@ function physics(d) {
         player.velX *= .97*d;
       }
 
-      if (Math.abs(player.velX) > 5){
-        player.velX = (player.velX > 0) ? 5:-5;
+      if (Math.abs(player.velX) > 8){
+        player.velX = (player.velX > 0) ? 8:-8;
       }
 
 
 
       if (keys[32]) { //Space
         if(player.onGround){
-          player.velY = 5  
+          player.velY = 10; 
           player.onGround = false;          
         }
       }
@@ -488,6 +491,10 @@ function physics(d) {
           if(player.posY + player.height/2 > gameHeight-player.height/2){
             player.die();
           }
+          if(player.posX > game.score){
+            game.score = player.posX;
+          }
+
     }
 
 

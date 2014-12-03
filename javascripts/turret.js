@@ -10,7 +10,6 @@ function turret(x, y, cooldown) {
   this.fire = function () {
       bulletList.push(new bullet(this.posX, this.posY+this.height/2, .1, .1, -3, 0));
       this.fireCooldown = this.fireCooldownMax;
-      tracer.log("FIRE"); 
   };
 
   this.draw = function () {

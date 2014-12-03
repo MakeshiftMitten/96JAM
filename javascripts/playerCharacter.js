@@ -11,7 +11,8 @@ function playerCharacter(x, y) {
   this.velA = 0;
   this.onGround = false;
   this.suicideCooldown = 0;
-  this.suicideCooldownMax = 1;
+  this.suicideCooldownMax = 3;
+  this.lives = 10;
 
   //this.pos
   this.getWidth = function () {
@@ -34,7 +35,8 @@ function playerCharacter(x, y) {
       this.suicideCooldown = this.suicideCooldownMax;
       this.posX = this.spawnX;
       this.posY = this.spawnY;
-
+      this.velX = 0;
+      this.velY = 0;
   };
 
 }
