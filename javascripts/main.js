@@ -435,6 +435,8 @@ function physics(d) {
         }
       }
 
+
+
       for (var bnum in blockList) {
           var blockVList = [];
           var block = blockList[bnum];
@@ -442,11 +444,14 @@ function physics(d) {
           //player.velY = -player.velY;
           //player.velA = -player.velA;
       }
-          player.posY -= player.velY * d;
-          //console.log("velY"+player.velY);
-          //console.log("posY"+player.posY);
+          player.posY -= player.velY * d;    
           player.posX += player.velX * d;
-      }
+          if(player.posY + player.height/2 > gameHeight){
+            player.die();
+          }
+    }
+
+
       
 
 
