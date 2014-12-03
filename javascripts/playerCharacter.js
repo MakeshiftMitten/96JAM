@@ -1,6 +1,6 @@
 function playerCharacter(x, y) {
   this.width = .5;//.47;
-  this.height = 1;//.73;
+  this.height = .9;//.73;
   this.posX = x;
   this.posY = y;
   this.spawnX = x;
@@ -31,12 +31,13 @@ function playerCharacter(x, y) {
 
   }
   this.die = function () {
-      wallList.push(new wall(this.posX-this.width/2, this.posY+this.height/2, this.height, this.width));
+      wallList.push(new wall(this.posX-this.width/2, this.posY+this.height/4*3, 1, .7));
       this.suicideCooldown = this.suicideCooldownMax;
-      this.posX = this.spawnX;
-      this.posY = this.spawnY;
+      this.posX = game.score - 30;
+      this.posY = 1;
       this.velX = 0;
       this.velY = 0;
+      bulletList = [];
   };
 
 }

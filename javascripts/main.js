@@ -102,10 +102,8 @@ var playerList = [];
 var wallList = [];
 wallList.push(new wall(0, gameHeight-2, gameWidth/2, 1));
 wallList.push(new wall(gameWidth/2 + 2, gameHeight-2, gameWidth/2, 1));
-wallList.push(new wall(gameWidth/2 + 8, gameHeight-8, gameWidth/2, 1));
 
 var bulletList = [];
-bulletList.push(new bullet(12, gameHeight-4, .1, .1, -3, 0));
 
 var turretList = [];
 turretList.push(new turret(12, gameHeight - 4, 3));
@@ -154,7 +152,6 @@ function block(x, y, width, height, landingPad) {
 }
 playerList.push(new playerCharacter(2, gameHeight -4));
 
-
 function drawGame() {
   d = clock.delta();
   physics(d);
@@ -173,8 +170,7 @@ function drawGame() {
       ctx.fillStyle = '#8ED6FF';
       ctx.translate(toPx(game.playerOffset), toPx(player.posY) + player.getHeight() / 2);            
     
-
-      console.log(toPx(player.posX));
+      
       ctx.drawImage(imgPlayer, -player.getWidth() / 2, -player.getHeight() / 2, player.getWidth(), player.getHeight());
           if(player.hasCargo)
           {                      
@@ -300,7 +296,9 @@ function gameObject() {
   this.won = false;
   this.level = 1;
   this.score = 0;
-
+  this.nextWave = 5;
+  this.increment = 40;
+  this.generator = new wallGenerator();
 
   this.playerOffset = 4;
 
@@ -381,8 +379,7 @@ function toPx(inMeters) {
   return inMeters * (canvasHeight / gameHeight);
 }
 
-function toMeters(inPx) {
-  console.log(inPx + " " + canvasHeight + " " + gameHeight);
+function toMeters(inPx) {  
   return inPx / canvasHeight * gameHeight;
 }
 
@@ -422,10 +419,25 @@ function physics(d) {
 
       bullet.posY -= bullet.velY * d;    
       bullet.posX += bullet.velX * d;
+      bullet.lifetime -= d;
+      if(bullet.lifetime <= 0){
+        bulletList.splice(bulletNum, 1);
+      }
+      for (var w = 0; w < wallList.length; w++){
+        if(bulletHitsWall(bullet, wallList[w])){
+          bulletList.splice(bulletNum, 1);        
+          break;
+        }
+      }
+
   }
   for (var playerNum = 0; playerNum < playerList.length; playerNum++) {
       var player = playerList[playerNum];
       player.velY -= 20*d;//  player.velA * d * .75;
+      if(player.velY < -10){
+        player.velY = -10;
+      }
+        
       player.suicideCooldown -= d;
       var dAngle = 0;
       var dPower = 0;
@@ -452,13 +464,13 @@ function physics(d) {
 
       if (keys[32]) { //Space
         if(player.onGround){
-          player.velY = 10; 
+          player.velY = 11; 
           player.onGround = false;          
         }
       }
 
 
-      if (keys[75]) {
+      if (keys[75]) { //K
         player.suicide();
         console.log("DIE");
       }
@@ -472,6 +484,11 @@ function physics(d) {
         }
         for (var w = 0; w < wallList.length; w++){
           if(playerHitsWall(playerList[p], wallList[w])){
+
+          }
+        }
+        for (var t = 0; t < turretList.length; t++){
+          if(playerHitsWall(playerList[p], turretList[t])){
 
           }
         }
@@ -493,14 +510,13 @@ function physics(d) {
           }
           if(player.posX > game.score){
             game.score = player.posX;
+            if(game.score > game.nextWave){
+              game.generator.generate(game.increment);
+              game.nextWave += game.increment;
+            }
           }
 
     }
-
-
-      
-
-
   }
 
  

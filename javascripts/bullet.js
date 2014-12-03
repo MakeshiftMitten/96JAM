@@ -1,10 +1,11 @@
-function bullet(x, y, width, height, velX, velY) {
+function bullet(x, y, width, height, velX, velY, lifetime) {
   this.posX = x;
   this.posY = y;
   this.velX = velX;
   this.velY = velY;
   this.width = width;
   this.height = height;
+  this.lifetime = lifetime;
 
   this.draw = function () {
     ctx.fillStyle = '#00CCCC';  
@@ -12,3 +13,4 @@ function bullet(x, y, width, height, velX, velY) {
   };
 
 }
+

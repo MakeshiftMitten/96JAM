@@ -1,14 +1,16 @@
-function turret(x, y, cooldown) {
+function turret(x, y, cooldown, shotspeed, lifetime) {
   this.width = 1;//.47;
   this.height = 1;//.73;
   this.posX = x;
-  this.posY = y;  
+  this.posY = y;
+  this.shotspeed = shotspeed; 
   this.fireCooldown = cooldown;
   this.fireCooldownMax = cooldown;  
+  this.lifetime = lifetime;
 
 
   this.fire = function () {
-      bulletList.push(new bullet(this.posX, this.posY+this.height/2, .1, .1, -3, 0));
+      bulletList.push(new bullet(this.posX, this.posY+this.height/2, .1, .1, -this.shotspeed, 0, lifetime));
       this.fireCooldown = this.fireCooldownMax;
   };
 
