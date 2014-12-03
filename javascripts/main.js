@@ -1,11 +1,10 @@
 keys = [];
+delay = [];
 window.requestAnimFrame = (function () {
   return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function (callback) {
       window.setTimeout(callback, 1000 / 60);
   };
 })();
-
-
 
 var game = new gameObject();
 var clock = new gameClock(new Date().getTime() / 1000);
@@ -103,7 +102,7 @@ var playerList = [];
 var wallList = [];
 wallList.push(new wall(0, gameHeight-2, gameWidth/2, .5));
 wallList.push(new wall(gameWidth/2 + 2, gameHeight-2, gameWidth/2, .5));
-wallList.push(new wall(gameWidth/2 + 8, gameHeight-8, gameWidth/2, .5))
+wallList.push(new wall(gameWidth/2 + 8, gameHeight-8, gameWidth/2, .5));
 
 var blockList = [];
 var cargoList = [];
@@ -151,7 +150,8 @@ playerList.push(new playerCharacter(2, gameHeight / 2));
 
 
 function drawGame() {
-  physics();
+  d = clock.delta();
+  physics(d);
   refresh();
   drawWalls();
 
@@ -385,8 +385,8 @@ function getStars(n) {
     
     return r;
 }
-function physics() {
-  d = clock.delta();
+function physics(d) {
+
   for (var playerNum = 0; playerNum < playerList.length; playerNum++) {
       var player = playerList[playerNum];
       player.velY -= 10*d;//  player.velA * d * .75;
@@ -422,7 +422,10 @@ function physics() {
       }
 
 
-
+      if (keys[75]) {
+        player.die();
+        console.log("DIE");
+      }
 
       for (var p = 0; p < playerList.length; p++){
         for (var w = 0; w < wallList.length; w++){
@@ -465,11 +468,12 @@ function physics() {
         return true;  
       }      
     }
-    
+
     //Hit from Bottom
     if (player.posY < wall.posY + wall.height && !(player.posY < wall.posY)){
       if(player.posX+player.width/2 >= wall.posX && player.posX - player.width/2 <= (wall.posX + wall.width)){
       player.posY = wall.posY + wall.height;
+      player.velY = 0;
       return true;
       }
     }
