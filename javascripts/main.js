@@ -104,6 +104,12 @@ wallList.push(new wall(0, gameHeight-2, gameWidth/2, 1));
 wallList.push(new wall(gameWidth/2 + 2, gameHeight-2, gameWidth/2, 1));
 wallList.push(new wall(gameWidth/2 + 8, gameHeight-8, gameWidth/2, 1));
 
+var bulletList = [];
+bulletList.push(new bullet(12, gameHeight-4, .1, .1, -3, 0));
+
+var turretList = [];
+turretList.push(new turret(12, gameHeight - 4, 3));
+
 var blockList = [];
 var cargoList = [];
 
@@ -154,6 +160,8 @@ function drawGame() {
   physics(d);
   refresh();
   drawWalls();
+  drawBullets();
+  drawTurrets();
 
   //Draw players
   for (var y = 0; y < playerList.length; y++) {
@@ -210,6 +218,16 @@ function drawBlocks() {
 function drawWalls() {
   for (var u = 0; u < wallList.length; u++)
     wallList[u].draw();
+}
+
+function drawBullets() {
+  for (var u = 0; u < bulletList.length; u++)
+    bulletList[u].draw();
+}
+
+function drawTurrets() {
+  for (var u = 0; u < turretList.length; u++)
+    turretList[u].draw();
 }
 
 function drawToolbar() {
@@ -385,8 +403,23 @@ function getStars(n) {
     
     return r;
 }
-function physics(d) {
-  tracer.log(d);
+function physics(d) {  
+
+  for (var turretNum = 0; turretNum < turretList.length; turretNum++) {
+      var turret = turretList[turretNum];      
+      if(turret.fireCooldown <= 0){
+        turret.fire();
+      }
+      turret.fireCooldown -= d;
+  }
+
+
+  for (var bulletNum = 0; bulletNum < bulletList.length; bulletNum++) {
+      var bullet = bulletList[bulletNum];      
+
+      bullet.posY -= bullet.velY * d;    
+      bullet.posX += bullet.velX * d;
+  }
   for (var playerNum = 0; playerNum < playerList.length; playerNum++) {
       var player = playerList[playerNum];
       player.velY -= 10*d;//  player.velA * d * .75;
@@ -427,7 +460,13 @@ function physics(d) {
         console.log("DIE");
       }
 
+
       for (var p = 0; p < playerList.length; p++){
+        for (var b = 0; b < bulletList.length; b++){
+          if(playerHitsBullet(playerList[p], bulletList[b])){
+            player.die();
+          }
+        }
         for (var w = 0; w < wallList.length; w++){
           if(playerHitsWall(playerList[p], wallList[w])){
 
@@ -457,61 +496,4 @@ function physics(d) {
 
   }
 
-  function playerHitsWall(player, wall){
-    tracer.log("Player Y: " + player.posY);
-    tracer.log("Player Height: " + player.height);
-    tracer.log("Wall Y: " + wall.posY);
-
-
-    //Hit from Top
-    if(player.posY+player.height > wall.posY && !(player.posY + player.height > wall.posY + wall.height/4)){
-      if(player.posX+player.width/2 >= wall.posX && player.posX - player.width/2 <= (wall.posX + wall.width)){        
-        player.posY = wall.posY - toMeters(player.getHeight());
-        player.onGround = true;
-        player.velY = 0;
-        console.log("hit Y!");
-        return true;
-      }      
-    }
-
-    //Hit from Bottom
-    if (player.posY < wall.posY + wall.height && !(player.posY < wall.posY + wall.height/4*3)){
-      if(player.posX+player.width/2 >= wall.posX && player.posX - player.width/2 <= (wall.posX + wall.width)){
-        player.posY = wall.posY + wall.height;
-        player.velY = 0;
-        return true;
-      }
-    }
-
-    //Hit from Left
-    if(player.posX + player.width/2 > wall.posX && !(player.posX + player.width/2 > wall.posX + .2)){
-      if((player.posY > wall.posY && player.posY < wall.posY + wall.height) //top of player in between wall vertices
-        ||(player.posY + player.height > wall.posY && player.posY + player.height < wall.posY + wall.height)//bottom of player in between wall vertices     {
-        ||(player.posY < wall.posY && player.posY + player.height > wall.posY + wall.height)){ //platform is skinnier than player and hits the trunk
-          player.posX = wall.posX - player.width/2; //-toMeters(4);
-          console.log("hit X!");
-          return 0;
-      }    
-    }
-    
-
-    //Hit from Right
-    if(player.posX - player.width/2 < wall.posX+wall.width && !(player.posX - player.width/2 < wall.posX + wall.width - .2)){
-      if((player.posY > wall.posY && player.posY < wall.posY + wall.height) //top of player in between wall vertices
-        ||(player.posY + player.height > wall.posY && player.posY + player.height < wall.posY + wall.height)//bottom of player in between wall vertices     {
-        ||(player.posY < wall.posY && player.posY + player.height > wall.posY + wall.height)){ //platform is skinnier than player and hits the trunk
-          player.posX = wall.posX + wall.width + player.width/2; //-toMeters(4);
-          console.log("hit X!");
-     
-      }    
-    }
-
-
-    
-
-    
-
-
-
-    return false;
-  }
+ 

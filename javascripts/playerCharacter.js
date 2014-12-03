@@ -30,7 +30,7 @@ function playerCharacter(x, y) {
 
   }
   this.die = function () {
-      wallList.push(new wall(this.posX, this.posY+this.height/2, this.height, this.width));
+      wallList.push(new wall(this.posX-this.width/2, this.posY+this.height/2, this.height, this.width));
       this.suicideCooldown = this.suicideCooldownMax;
       this.posX = this.spawnX;
       this.posY = this.spawnY;
