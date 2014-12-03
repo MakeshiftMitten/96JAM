@@ -470,7 +470,7 @@ function physics(d) {
         player.onGround = true;
         player.velY = 0;
         console.log("hit Y!");
-     
+        return true;
       }      
     }
 
@@ -479,17 +479,28 @@ function physics(d) {
       if(player.posX+player.width/2 >= wall.posX && player.posX - player.width/2 <= (wall.posX + wall.width)){
         player.posY = wall.posY + wall.height;
         player.velY = 0;
-     
+        return true;
       }
     }
 
-
     //Hit from Left
-    if(player.posX + player.width/2 > wall.posX && !(player.posX - player.width/2 > wall.posX )){
+    if(player.posX + player.width/2 > wall.posX && !(player.posX + player.width/2 > wall.posX + .2)){
       if((player.posY > wall.posY && player.posY < wall.posY + wall.height) //top of player in between wall vertices
         ||(player.posY + player.height > wall.posY && player.posY + player.height < wall.posY + wall.height)//bottom of player in between wall vertices     {
         ||(player.posY < wall.posY && player.posY + player.height > wall.posY + wall.height)){ //platform is skinnier than player and hits the trunk
           player.posX = wall.posX - player.width/2; //-toMeters(4);
+          console.log("hit X!");
+          return 0;
+      }    
+    }
+    
+
+    //Hit from Right
+    if(player.posX - player.width/2 < wall.posX+wall.width && !(player.posX - player.width/2 < wall.posX + wall.width - .2)){
+      if((player.posY > wall.posY && player.posY < wall.posY + wall.height) //top of player in between wall vertices
+        ||(player.posY + player.height > wall.posY && player.posY + player.height < wall.posY + wall.height)//bottom of player in between wall vertices     {
+        ||(player.posY < wall.posY && player.posY + player.height > wall.posY + wall.height)){ //platform is skinnier than player and hits the trunk
+          player.posX = wall.posX + wall.width + player.width/2; //-toMeters(4);
           console.log("hit X!");
      
       }    
