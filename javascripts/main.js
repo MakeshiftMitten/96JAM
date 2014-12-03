@@ -344,27 +344,6 @@ function gameTracer() {
   };
 }
 
-function playerCharacter(x, y) {
-  this.width = .5;//.47;
-  this.height = 1;//.73;
-  this.posX = x;
-  this.posY = y;
-  this.posA = 0;
-  this.velX = 0;
-  this.velY = 0;
-  this.velA = 0;
-
-  //this.pos
-  this.getWidth = function () {
-      return toPx(this.width);
-  };
-
-  this.getHeight = function () {
-      return toPx(this.height);
-  };
-
-}
-
 function settingsObject() {
 
   this.gravity = false;
@@ -373,47 +352,7 @@ function settingsObject() {
 
 }
 
-function button(name, x, y, size, text) {
-  this.name = name;
-  this.posX = x - 5;
-  this.posY = y;
-  this.content = text;
-  this.text = this.content;
-  this.size = size; //fontsize
-  this.width = this.text.length * this.size / 1.8;
-  this.height = this.size + 3;
-  this.down = false;
 
-  this.draw = function () {
-      ctx.save();
-
-      ctx.font = "" + this.size + "px Impact";
-      ctx.fillStyle = "#aaa";
-      ctx.fillRect(this.posX, this.posY, this.width, this.height);
-
-      ctx.fillStyle = "Black";
-      ctx.fillText(this.text, this.posX + 11, this.posY + this.size);
-      ctx.fillStyle = 'rgba(256, 256, 256, .4)';
-      ctx.fillRect(this.posX + 2, this.posY + 1, this.width - 4, this.size - 8);
-      ctx.fillStyle = 'rgba(0,0,0,.3)';
-      ctx.fillRect(this.posX + 2, this.posY + 13, this.width - 4, this.size - 11);
-
-      ctx.restore();
-  };
-
-  this.isHit = function (clickX, clickY) {
-      if (clickX > this.posX && clickX < (this.posX + this.width) && clickY > this.posY && clickY < (this.posY + this.height)) {
-          //this.text = "STOP HITTING ME";
-          return true;
-      } else {
-          //this.text = "MISSED ME";  
-          return false;
-      }
-
-
-  }
-
-}
 
 
 
@@ -450,7 +389,7 @@ function physics() {
   d = clock.delta();
   for (var playerNum = 0; playerNum < playerList.length; playerNum++) {
       var player = playerList[playerNum];
-      player.velY -= .5;//  player.velA * d * .75;
+      player.velY -= 10*d;//  player.velA * d * .75;
 
       var dAngle = 0;
       var dPower = 0;
@@ -460,15 +399,26 @@ function physics() {
       
 
       if (keys[37]) { //Left
-        player.velX = -2;
+        player.velX += -1;
+      }
+      else if (keys[39]) { //Right
+        player.velX += 1;
+      }
+      else{
+        player.velX *= .97*d;
       }
 
-      if (keys[39]) { //Right
-        player.velX = 2;
+      if (Math.abs(player.velX) > 5){
+        player.velX = (player.velX > 0) ? 5:-5;
       }
 
-      if (keys[32]) {
-        player.velY += 1;
+
+
+      if (keys[32]) { //Space
+        if(player.onGround){
+          player.velY = 5  
+          player.onGround = false;          
+        }
       }
 
 
@@ -511,17 +461,19 @@ function physics() {
     if(player.posY+player.height > wall.posY && !(player.posY + player.height > wall.posY + wall.height)){
       if(player.posX+player.width/2 >= wall.posX && player.posX - player.width/2 <= (wall.posX + wall.width)){        
         player.posY = wall.posY - toMeters(player.getHeight());
+        player.onGround = true;
         return true;  
       }      
     }
-
+    
     //Hit from Bottom
-    if(player.posY < wall.posY + wall.height && !(player.posY < wall.posY)){
+    if (player.posY < wall.posY + wall.height && !(player.posY < wall.posY)){
       if(player.posX+player.width/2 >= wall.posX && player.posX - player.width/2 <= (wall.posX + wall.width)){
       player.posY = wall.posY + wall.height;
       return true;
+      }
     }
-    }
+
 
 
     return false;
