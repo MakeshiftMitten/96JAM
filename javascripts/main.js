@@ -1,5 +1,5 @@
 keys = [];
-delay = [];
+
 window.requestAnimFrame = (function () {
   return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function (callback) {
       window.setTimeout(callback, 1000 / 60);
@@ -100,9 +100,9 @@ var hardButton = new button("hard", 260, 80, 15, "H ARD");
 var playerList = [];
 
 var wallList = [];
-wallList.push(new wall(0, gameHeight-2, gameWidth/2, .5));
-wallList.push(new wall(gameWidth/2 + 2, gameHeight-2, gameWidth/2, .5));
-wallList.push(new wall(gameWidth/2 + 8, gameHeight-8, gameWidth/2, .5));
+wallList.push(new wall(0, gameHeight-2, gameWidth/2, 1));
+wallList.push(new wall(gameWidth/2 + 2, gameHeight-2, gameWidth/2, 1));
+wallList.push(new wall(gameWidth/2 + 8, gameHeight-8, gameWidth/2, 1));
 
 var blockList = [];
 var cargoList = [];
@@ -386,11 +386,11 @@ function getStars(n) {
     return r;
 }
 function physics(d) {
-
+  tracer.log(d);
   for (var playerNum = 0; playerNum < playerList.length; playerNum++) {
       var player = playerList[playerNum];
       player.velY -= 10*d;//  player.velA * d * .75;
-
+      player.suicideCooldown -= d;
       var dAngle = 0;
       var dPower = 0;
       var dVelX = 0;
@@ -423,14 +423,14 @@ function physics(d) {
 
 
       if (keys[75]) {
-        player.die();
+        player.suicide();
         console.log("DIE");
       }
 
       for (var p = 0; p < playerList.length; p++){
         for (var w = 0; w < wallList.length; w++){
           if(playerHitsWall(playerList[p], wallList[w])){
-            playerList[p].velY = 0;
+
           }
         }
       }
@@ -446,7 +446,7 @@ function physics(d) {
       }
           player.posY -= player.velY * d;    
           player.posX += player.velX * d;
-          if(player.posY + player.height/2 > gameHeight){
+          if(player.posY + player.height/2 > gameHeight-player.height/2){
             player.die();
           }
     }
@@ -458,30 +458,47 @@ function physics(d) {
   }
 
   function playerHitsWall(player, wall){
-    tracer.log(player.posY);
-    tracer.log(wall.posY);
-    tracer.log(player.height);
-    tracer.log((wall.posX + wall.width));
-    tracer.log(player.posX > wall.posX);
-    tracer.log(player.posX < (wall.PosX + wall.width));
+    tracer.log("Player Y: " + player.posY);
+    tracer.log("Player Height: " + player.height);
+    tracer.log("Wall Y: " + wall.posY);
+
 
     //Hit from Top
-    if(player.posY+player.height > wall.posY && !(player.posY + player.height > wall.posY + wall.height)){
+    if(player.posY+player.height > wall.posY && !(player.posY + player.height > wall.posY + wall.height/4)){
       if(player.posX+player.width/2 >= wall.posX && player.posX - player.width/2 <= (wall.posX + wall.width)){        
         player.posY = wall.posY - toMeters(player.getHeight());
         player.onGround = true;
-        return true;  
+        player.velY = 0;
+        console.log("hit Y!");
+     
       }      
     }
 
     //Hit from Bottom
-    if (player.posY < wall.posY + wall.height && !(player.posY < wall.posY)){
+    if (player.posY < wall.posY + wall.height && !(player.posY < wall.posY + wall.height/4*3)){
       if(player.posX+player.width/2 >= wall.posX && player.posX - player.width/2 <= (wall.posX + wall.width)){
-      player.posY = wall.posY + wall.height;
-      player.velY = 0;
-      return true;
+        player.posY = wall.posY + wall.height;
+        player.velY = 0;
+     
       }
     }
+
+
+    //Hit from Left
+    if(player.posX + player.width/2 > wall.posX && !(player.posX - player.width/2 > wall.posX )){
+      if((player.posY > wall.posY && player.posY < wall.posY + wall.height) //top of player in between wall vertices
+        ||(player.posY + player.height > wall.posY && player.posY + player.height < wall.posY + wall.height)//bottom of player in between wall vertices     {
+        ||(player.posY < wall.posY && player.posY + player.height > wall.posY + wall.height)){ //platform is skinnier than player and hits the trunk
+          player.posX = wall.posX - player.width/2; //-toMeters(4);
+          console.log("hit X!");
+     
+      }    
+    }
+
+
+    
+
+    
 
 
 

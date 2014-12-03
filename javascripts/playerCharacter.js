@@ -10,6 +10,8 @@ function playerCharacter(x, y) {
   this.velY = 0;
   this.velA = 0;
   this.onGround = false;
+  this.suicideCooldown = 0;
+  this.suicideCooldownMax = 1;
 
   //this.pos
   this.getWidth = function () {
@@ -20,10 +22,19 @@ function playerCharacter(x, y) {
       return toPx(this.height);
   };
 
+  this.suicide = function () {
+    if(this.suicideCooldown <= 0){
+      this.die();  
+    }
+    
+
+  }
   this.die = function () {
-      wallList.push(new wall(this.posX, this.posY, this.height, this.width));
+      wallList.push(new wall(this.posX, this.posY+this.height/2, this.height, this.width));
+      this.suicideCooldown = this.suicideCooldownMax;
       this.posX = this.spawnX;
       this.posY = this.spawnY;
+
   };
 
 }
