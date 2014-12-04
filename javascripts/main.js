@@ -161,6 +161,8 @@ function drawGame() {
   drawTurrets();
   tracer.log("Score: " + Math.floor(game.score));
   tracer.log("Lives: " + playerList[0].lives);
+  tracer.log("Difficulty: " + Math.floor(game.score)+1);
+  tracer.log("Platforms: " + Math.floor(playerList[0].platforms));
   //Draw players
   for (var y = 0; y < playerList.length; y++) {
       var player = playerList[y];
@@ -439,6 +441,7 @@ function physics(d) {
       }
         
       player.suicideCooldown -= d;
+      player.platformCooldown -= d;
       var dAngle = 0;
       var dPower = 0;
       var dVelX = 0;
@@ -446,10 +449,10 @@ function physics(d) {
 
       
 
-      if (keys[37]) { //Left
+      if (keys[65]) { //Left
         player.velX += -1;
       }
-      else if (keys[39]) { //Right
+      else if (keys[68]) { //Right
         player.velX += 1;
       }
       else{
@@ -464,13 +467,17 @@ function physics(d) {
 
       if (keys[32]) { //Space
         if(player.onGround){
-          player.velY = 11; 
+          player.velY = 10; 
           player.onGround = false;          
         }
       }
 
+      if (keys[87]) { //W
+        if(player.platforms > 0 && player.platformCooldown <=0)
+          player.platform();
+      }
 
-      if (keys[75]) { //K
+      if (keys[83]) { //S
         player.suicide();
         console.log("DIE");
       }
