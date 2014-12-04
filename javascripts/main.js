@@ -74,9 +74,10 @@ var canvasWidth = canvas.width;
 
 var buttons = [];
 //Top Level Buttons
-var gameButton = new button("game", 260, 120, 30, "PL AY");
+var gameButton = new button("game", 600, 350, 30, "PL AY");
 var settingsButton = new button("settings", 100, 0, 15, "SETTINGS");
 var menuButton = new button("menu", 52, 0, 15, "MENU ");
+var restartButton = new button("game", 52, 0, 15, "RESTART ");
 
 
 //Shared Buttons
@@ -97,7 +98,7 @@ var hardButton = new button("hard", 260, 80, 15, "H ARD");
 //buttons.push(gameButton);
 
 //Game Buttons
-//buttons.push(
+buttons.push(gameButton);
 
 var playerList = [];
 
@@ -222,6 +223,28 @@ function drawMenu() {
   ctx.restore();
 }
 
+function drawGameOver() {
+  ctx.save();
+
+  ctx.fillStyle = '#999';
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = "white";
+                ctx.save();
+                ctx.font = "bold 40px Arial";
+               ctx.fillText("YOUR LINE",canvasWidth/2-55, canvasHeight/2-40);
+               ctx.fillStyle = "black";
+               ctx.fillText("IS",canvasWidth/2-55, canvasHeight/2);
+               ctx.fillStyle = "white";
+               ctx.fillText("EXTINCT",canvasWidth/2-55, canvasHeight/2+40);
+                ctx.restore();
+
+  ctx.restore();
+}
+
+
+
+
+
 function drawSettings() {
   // I dont thing save/restore is necessary here
   //ctx.save();
@@ -286,7 +309,7 @@ function drawToolbar() {
 
   if (game.state == "game") drawGame();
   else if (game.state == "menu") drawMenu();
-  else if (game.state == "settings") drawSettings();
+  else if (game.state == "dead") drawGameOver();
   else {
       drawRect(0, 0, canvasWidth, canvasHeight);
   }
@@ -321,7 +344,7 @@ var levels = [];
 
 function gameObject() {
   this.mouse = new mouse(0, 0);
-  this.state = "game"; //menu, settings, game   
+  this.state = "menu"; //menu, settings, game   
   this.pause = false;
   this.debug = true;
   this.lost = false;
@@ -352,10 +375,10 @@ function gameObject() {
               buttons.length = 0;              
               break;
 
-          case "next":
-              this.state = "game";
-              this.level++;              
-              importLevel(this.level);
+          case "dead":
+              this.state = "dead";
+              buttons.length = 0;
+              buttons.push(restartButton);
               break;
           case "menu":
 

@@ -35,19 +35,20 @@ function playerCharacter(x, y) {
 
   }
   this.die = function () {
-    var a = new ancestor(this.posX-this.width/2, this.posY+this.height/4*3, 1, .7);
-    console.log(a);
+    var a = new ancestor(this.posX-this.width/2, this.posY+this.height/4*3, 1, .7);    
       ancestorList.push(a);
       this.suicideCooldown = this.suicideCooldownMax;
       this.lives -= 1;
-      if(this.lives > 1){
+      if(this.lives >= 0){
         this.posX = game.score - 30;
         if(this.posX < 0) this.posX = 2;
         this.posY = 1;
         this.velX = 0;
         this.velY = 0;
-        bulletList = [];
-        
+        bulletList = [];        
+      }
+      else{
+        game.state = "dead";
       }
   };
 
