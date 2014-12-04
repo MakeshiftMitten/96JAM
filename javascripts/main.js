@@ -414,7 +414,7 @@ function gameTracer() {
       ctx.font = "bold 15px Arial";
 
       for (var x = 0; x < this.logList.length; x++) {
-          ctx.fillText(this.logList[x], canvasWidth/2-100, x * 15 + 100);
+          ctx.fillText(this.logList[x], 20, x * 15 + 50);
       }
       ctx.restore();
   };
