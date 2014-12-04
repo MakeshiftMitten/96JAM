@@ -10,7 +10,9 @@ var game = new gameObject();
 var clock = new gameClock(new Date().getTime() / 1000);
 var tracer = new gameTracer();
 var imgPlayer = new Image();
+var imgTomb = new Image();
 imgPlayer.src = 'astronaut.png';
+imgTomb.src = 'rip.png';
 
 var canvas = document.getElementById('c');
 if (canvas.getContext) {
@@ -103,10 +105,12 @@ var wallList = [];
 wallList.push(new wall(0, gameHeight-2, gameWidth/2, 1));
 wallList.push(new wall(gameWidth/2 + 2, gameHeight-2, gameWidth/2, 1));
 
+var ancestorList = [];
+
 var bulletList = [];
 
 var turretList = [];
-turretList.push(new turret(12, gameHeight - 4, 3));
+turretList.push(new turret(12, gameHeight - 4, 2, 4, 3));
 
 var blockList = [];
 var cargoList = [];
@@ -120,6 +124,21 @@ function wall(x, y, width, height) {
   this.draw = function () {
     ctx.fillStyle = '#00CCCC';  
     ctx.fillRect(toPx(this.posX-playerList[0].posX + game.playerOffset), toPx(this.posY), toPx(this.width), toPx(this.height));
+  };
+
+}
+
+function ancestor(x, y, width, height) {
+  this.posX = x;
+  this.posY = y;
+  this.width = width;
+  this.height = height;
+
+  this.draw = function () {
+    ctx.fillStyle = '#FFCCCC';  
+    //ctx.fillRect(toPx(this.posX-playerList[0].posX + game.playerOffset), toPx(this.posY), toPx(this.width), toPx(this.height));    
+    //console.log(toPx(this.posX-playerList[0].posX + game.playerOffset) + " " + toPx(this.posY) + " " + toPx(this.width) + " " + toPx(this.height) );
+    ctx.drawImage(imgTomb,toPx(this.posX-playerList[0].posX + game.playerOffset), toPx(this.posY), toPx(this.width), toPx(this.height));
   };
 
 }
@@ -156,12 +175,14 @@ function drawGame() {
   d = clock.delta();
   physics(d);
   refresh();
-  drawWalls();
   drawBullets();
+  drawWalls();
+  drawAncestors();
+  
   drawTurrets();
   tracer.log("Score: " + Math.floor(game.score));
   tracer.log("Lives: " + playerList[0].lives);
-  tracer.log("Difficulty: " + Math.floor(game.score)+1);
+  tracer.log("Difficulty: " + game.difficulty);
   tracer.log("Platforms: " + Math.floor(playerList[0].platforms));
   //Draw players
   for (var y = 0; y < playerList.length; y++) {
@@ -217,6 +238,15 @@ function drawBlocks() {
 function drawWalls() {
   for (var u = 0; u < wallList.length; u++)
     wallList[u].draw();
+}
+
+function drawAncestors() {  
+
+  for(var u = 0; u < ancestorList.length; u++){
+    console.log(u);
+    console.log(ancestorList[u]);    
+    ancestorList[u].draw();
+  }
 }
 
 function drawBullets() {
@@ -300,6 +330,8 @@ function gameObject() {
   this.score = 0;
   this.nextWave = 5;
   this.increment = 40;
+  this.difficulty = 0;
+
   this.generator = new wallGenerator();
 
   this.playerOffset = 4;
@@ -432,6 +464,13 @@ function physics(d) {
         }
       }
 
+      for (var w = 0; w < ancestorList.length; w++){
+        if(bulletHitsWall(bullet, ancestorList[w])){
+          bulletList.splice(bulletNum, 1);        
+          break;
+        }
+      }
+
   }
   for (var playerNum = 0; playerNum < playerList.length; playerNum++) {
       var player = playerList[playerNum];
@@ -494,6 +533,13 @@ function physics(d) {
 
           }
         }
+
+        for (var w = 0; w < ancestorList.length; w++){
+          if(playerHitsWall(playerList[p], ancestorList[w])){
+
+          }
+        }
+
         for (var t = 0; t < turretList.length; t++){
           if(playerHitsWall(playerList[p], turretList[t])){
 
@@ -515,10 +561,16 @@ function physics(d) {
           if(player.posY + player.height/2 > gameHeight-player.height/2){
             player.die();
           }
-          if(player.posX > game.score){
-            game.score = player.posX;
+          if(Math.floor(player.posX) > game.score){
+            game.score = Math.floor(player.posX);
+            if(game.score % 50 == 0)
+              player.lives += 1;
+            if(game.score % 100 == 0){
+              player.platforms += 1;
+              game.difficulty += 1;
+            }
             if(game.score > game.nextWave){
-              game.generator.generate(game.increment);
+              game.generator.generate(game.increment, game.difficulty);
               game.nextWave += game.increment;
             }
           }

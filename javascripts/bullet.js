@@ -8,7 +8,7 @@ function bullet(x, y, width, height, velX, velY, lifetime) {
   this.lifetime = lifetime;
 
   this.draw = function () {
-    ctx.fillStyle = '#00CCCC';  
+    ctx.fillStyle = '#FF0000';  
     ctx.fillRect(toPx(this.posX-playerList[0].posX + game.playerOffset), toPx(this.posY), toPx(this.width), toPx(this.height));
   };
 

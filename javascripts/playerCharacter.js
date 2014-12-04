@@ -14,8 +14,8 @@ function playerCharacter(x, y) {
   this.suicideCooldownMax = 3;
   this.platformCooldown = 0;
   this.platformCooldownMax = 3;
-  this.lives = 10;
-  this.platforms = 2;
+  this.lives = 5;
+  this.platforms = 5;
 
   //this.pos
   this.getWidth = function () {
@@ -35,8 +35,11 @@ function playerCharacter(x, y) {
 
   }
   this.die = function () {
-      wallList.push(new wall(this.posX-this.width/2, this.posY+this.height/4*3, 1, .7));
+    var a = new ancestor(this.posX-this.width/2, this.posY+this.height/4*3, 1, .7);
+    console.log(a);
+      ancestorList.push(a);
       this.suicideCooldown = this.suicideCooldownMax;
+      this.lives -= 1;
       if(this.lives > 1){
         this.posX = game.score - 30;
         if(this.posX < 0) this.posX = 2;
@@ -44,7 +47,7 @@ function playerCharacter(x, y) {
         this.velX = 0;
         this.velY = 0;
         bulletList = [];
-        this.lives -= 1;
+        
       }
   };
 

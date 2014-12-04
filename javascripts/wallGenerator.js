@@ -2,7 +2,7 @@ function wallGenerator() {
 
 	this.lastGenerated = 40;
 
-	this.generate = function(increment){		
+	this.generate = function(increment, difficulty){		
 		wallList.push(new wall(this.lastGenerated, gameHeight/4*3, 10,  1));				
 		console.log(increment);
 		for(var block = 0; block < increment/8; block++){
